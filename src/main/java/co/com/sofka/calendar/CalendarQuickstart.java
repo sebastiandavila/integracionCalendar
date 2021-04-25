@@ -89,7 +89,7 @@ public class CalendarQuickstart {
                 //System.out.printf("%s (%s)\n", event.getSummary(), start);
             }
         }
-        deleteCredential();
+
         return items;
 
     }
@@ -166,11 +166,5 @@ public class CalendarQuickstart {
 
 
     }
-    public void deleteCredential(){
-        File fichero = new File("tokens/StoredCredential");
-        if (fichero.delete()){
-            System.out.println("El fichero ha sido borrado satisfactoriamente");}
-        else{
-            System.out.println("El fichero no puede ser borrado");}
-    }
+
 }
