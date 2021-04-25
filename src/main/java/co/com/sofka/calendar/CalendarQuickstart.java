@@ -40,7 +40,7 @@ public class CalendarQuickstart {
      * @return An authorized Credential object.
      * @throws IOException If the credentials.json file cannot be found.
      */
-    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
+    public static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
         // Load client secrets.
         InputStream in = CalendarQuickstart.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
@@ -55,6 +55,7 @@ public class CalendarQuickstart {
                 .setAccessType("offline")
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
@@ -98,10 +99,19 @@ public class CalendarQuickstart {
         Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
+
+        Event.Creator creator = new Event.Creator();
+        creator.setEmail("jacobogarceso@idem.edu.co");
+        creator.setDisplayName("Jacobo");
+        creator.setId("propietario");
+        creator.setSelf(true);
+
         Event event = new Event()
                 .setSummary(evento.getTitulo())
                 .setLocation(evento.getUbicacion())
-                .setDescription(evento.getDescripcion());
+                .setDescription(evento.getDescripcion())
+                .setCreator(creator);
+
 
         DateTime startDateTime = new DateTime(evento.buildDateStart());
         EventDateTime start = new EventDateTime()
@@ -138,7 +148,6 @@ public class CalendarQuickstart {
         event.setReminders(reminders);
 
 
-
         ConferenceSolutionKey conferenceSKey = new ConferenceSolutionKey();
         conferenceSKey.setType("hangoutsMeet"); // Non-G suite user
         CreateConferenceRequest createConferenceReq = new CreateConferenceRequest();
@@ -148,17 +157,14 @@ public class CalendarQuickstart {
         conferenceData.setCreateRequest(createConferenceReq);
         event.setConferenceData(conferenceData); // attach the meeting to your event
 
-        Event.Creator creator = new Event.Creator();
-        creator.setEmail("jacobogarceso@idem.edu.co");
-        creator.setDisplayName("Jacobo");
-        event.setCreator(creator);
+
 
         String calendarId = "primary";
 
         event = service.events().insert(calendarId, event).setSendNotifications(true).setConferenceDataVersion(1).execute();
         System.out.printf("Event created: %s\n", event.getHtmlLink());
 
-        deleteCredential();
+
     }
     public void deleteCredential(){
         File fichero = new File("tokens/StoredCredential");
